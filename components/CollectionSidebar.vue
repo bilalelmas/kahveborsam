@@ -1,7 +1,8 @@
 <template>
   <div class="collection-container">
-    <div class="filter-header">
-      <div class="categories">
+    <div class="content-wrapper">
+      <!-- Sol Sidebar -->
+      <div class="sidebar">
         <h3>KATEGORİLER</h3>
         <ul class="category-list">
           <li v-for="(category, index) in categories" :key="index">
@@ -9,24 +10,42 @@
           </li>
         </ul>
       </div>
-      <div class="filter-actions">
-        <button class="filter-btn">
-          <i class="bi bi-funnel"></i> Filtre
-        </button>
-        <button class="sort-btn">
-          <i class="bi bi-grid"></i> Varsayılan sıralama
-        </button>
-      </div>
-    </div>
 
-    <div class="products-grid">
-      <div v-for="product in products" :key="product.id" class="product-card">
-        <div class="product-image">
-          <img :src="product.image" :alt="product.name">
+      <!-- Sağ İçerik -->
+      <div class="main-content">
+        <div class="filter-actions">
+          <button class="filter-btn">
+            <i class="bi bi-funnel"></i> Filtre
+          </button>
+          <div class="sort-wrapper">
+            <button class="sort-btn">
+              <i class="bi bi-grid"></i>
+              <span>Varsayılan sıralama</span>
+            </button>
+          </div>
         </div>
-        <div class="product-info">
-          <h3 class="product-title">{{ product.name }}</h3>
-          <div class="product-price">{{ product.price }}TL</div>
+
+        <div class="products-grid">
+          <div v-for="product in products" :key="product.id" class="product-card">
+            <div class="product-image">
+              <img :src="product.image" :alt="product.name">
+              <div class="product-buttons">
+                <button class="btn btn-option" @click="addToCart(product)">
+                  <i class="bi bi-cart"></i>
+                </button>
+                <button class="btn btn-option">
+                  <i class="bi bi-search"></i>
+                </button>
+                <button class="btn btn-option">
+                  <i class="bi bi-heart"></i>
+                </button>
+              </div>
+            </div>
+            <div class="product-info">
+              <h3 class="product-title">{{ product.name }}</h3>
+              <div class="product-price">{{ product.price }} TL</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -35,14 +54,22 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { collection, getDocs, limit, query } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
+import { useCartStore } from '~/stores/cart';
+import { useRouter } from 'vue-router';
+import { getAuth } from 'firebase/auth';
 import { db } from '~/boot/firebase';
 
+const auth = getAuth();
+const router = useRouter();
+const cartStore = useCartStore();
+
 interface Product {
-  id: string;
+  id: number;
   name: string;
   price: string;
   image: string;
+  quantity: number;
 }
 
 const categories = ref([
@@ -54,22 +81,164 @@ const categories = ref([
   { name: 'Single Origin' }
 ]);
 
-const products = ref<Product[]>([]);
+const defaultProducts = [
+  {
+    id: 1,
+    name: 'Brazilya Rio Minas Elek. 17/18 NY2/3 Arabica ORTA Kavrulmuş Kahve',
+    price: '600.00',
+    image: 'https://kahveborsam.com/cdn/shop/files/KB-17.jpg?v=1685610662',
+    quantity: 1
+  },
+  {
+    id: 2,
+    name: 'Colombia Supremo EP Arabica ORTA Kavrulmuş Kahve',
+    price: '700.00',
+    image: 'https://kahveborsam.com/cdn/shop/files/KB-17.jpg?v=1685610662',
+    quantity: 1
+  },
+  {
+    id: 3,
+    name: 'Ethiopia Yirgacheffe G2 Arabica ORTA Kavrulmuş Kahve',
+    price: '800.00',
+    image: 'https://kahveborsam.com/cdn/shop/files/KB-17.jpg?v=1685610662',
+    quantity: 1
+  },
+  {
+    id: 4,
+    name: 'Guatemala SHB EP Arabica ORTA Kavrulmuş Kahve',
+    price: '750.00',
+    image: 'https://kahveborsam.com/cdn/shop/files/KB-17.jpg?v=1685610662',
+    quantity: 1
+  },
+  {
+    id: 5,
+    name: 'Kenya AA Plus Arabica ORTA Kavrulmuş Kahve',
+    price: '900.00',
+    image: 'https://kahveborsam.com/cdn/shop/files/KB-17.jpg?v=1685610662',
+    quantity: 1
+  },
+  {
+    id: 6,
+    name: 'Costa Rica Tarrazu Arabica ORTA Kavrulmuş Kahve',
+    price: '850.00',
+    image: 'https://kahveborsam.com/cdn/shop/files/KB-17.jpg?v=1685610662',
+    quantity: 1
+  },
+  {
+    id: 7,
+    name: 'Panama Boquete Arabica ORTA Kavrulmuş Kahve',
+    price: '950.00',
+    image: 'https://kahveborsam.com/cdn/shop/files/KB-17.jpg?v=1685610662',
+    quantity: 1
+  },
+  {
+    id: 8,
+    name: 'Honduras SHG EP Arabica ORTA Kavrulmuş Kahve',
+    price: '650.00',
+    image: 'https://kahveborsam.com/cdn/shop/files/KB-17.jpg?v=1685610662',
+    quantity: 1
+  },
+  {
+    id: 9,
+    name: 'Peru HB MCM EP Arabica ORTA Kavrulmuş Kahve',
+    price: '700.00',
+    image: 'https://kahveborsam.com/cdn/shop/files/KB-17.jpg?v=1685610662',
+    quantity: 1
+  },
+  {
+    id: 10,
+    name: 'El Salvador SHG EP Arabica ORTA Kavrulmuş Kahve',
+    price: '800.00',
+    image: 'https://kahveborsam.com/cdn/shop/files/KB-17.jpg?v=1685610662',
+    quantity: 1
+  },
+  {
+    id: 11,
+    name: 'Nicaragua SHG EP Arabica ORTA Kavrulmuş Kahve',
+    price: '750.00',
+    image: 'https://kahveborsam.com/cdn/shop/files/KB-17.jpg?v=1685610662',
+    quantity: 1
+  },
+  {
+    id: 12,
+    name: 'Mexico Altura Arabica ORTA Kavrulmuş Kahve',
+    price: '680.00',
+    image: 'https://kahveborsam.com/cdn/shop/files/KB-17.jpg?v=1685610662',
+    quantity: 1
+  }
+];
+
+const products = ref<Product[]>(defaultProducts);
 
 const fetchProducts = async () => {
   try {
-    const productsRef = collection(db, 'products');
-    const q = query(productsRef, limit(12));
-    const querySnapshot = await getDocs(q);
+    const productsRef = collection(db, 'Products');
+    const querySnapshot = await getDocs(productsRef);
     
-    products.value = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      name: doc.data().name || '',
-      price: doc.data().price || '',
-      image: doc.data().image || ''
-    }));
-  } catch (error) {
+    console.log('Firestore bağlantısı:', db);
+    console.log('Collection referansı:', productsRef);
+    console.log('Query snapshot:', querySnapshot);
+    console.log('Döküman sayısı:', querySnapshot.size);
+
+    // Firestore'dan gelen verileri geçici bir array'de topla
+    const fetchedProducts: Product[] = [];
+    querySnapshot.docs.forEach(doc => {
+      const data = doc.data();
+      fetchedProducts.push({
+        id: parseInt(data.id),
+        name: data.name,
+        price: data.price,
+        image: data.image,
+        quantity: data.quantity
+      });
+    });
+
+    // ID'ye göre sırala
+    fetchedProducts.sort((a, b) => a.id - b.id);
+
+    // Sıralanmış verileri mevcut ürünlerle birleştir
+    fetchedProducts.forEach((product, index) => {
+      if (index < products.value.length) {
+        products.value[index] = {
+          ...products.value[index],
+          ...product
+        };
+      }
+    });
+
+    console.log('Güncellenmiş ürünler:', products.value);
+
+  } catch (error: unknown) {
     console.error('Ürünler yüklenirken hata:', error);
+    if (error instanceof Error) {
+      console.error('Hata detayı:', error.message);
+    }
+  }
+};
+
+const addToCart = async (product: Product) => {
+  try {
+    if (!auth.currentUser) {
+      alert('Lütfen önce giriş yapın');
+      router.push('/TheGirisPage');
+      return;
+    }
+
+    await cartStore.addToCart({
+      id: product.id.toString(),
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      quantity: 1
+    });
+    alert('Ürün başarıyla sepete eklendi!');
+  } catch (error: unknown) {
+    console.error('Sepete ekleme hatası:', error);
+    if (error instanceof Error) {
+      alert(`Ürün sepete eklenirken bir hata oluştu: ${error.message}`);
+    } else {
+      alert('Ürün sepete eklenirken bir hata oluştu. Lütfen tekrar deneyin.');
+    }
   }
 };
 
@@ -85,49 +254,107 @@ onMounted(() => {
   padding: 20px;
 }
 
-.filter-header {
+.content-wrapper {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 30px;
+  gap: 30px;
 }
 
-.categories h3 {
+.sidebar {
+  width: 250px;
+  flex-shrink: 0;
+}
+
+.sidebar h3 {
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 15px;
+  color: #333;
+  text-transform: uppercase;
 }
 
 .category-list {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .category-link {
   display: block;
-  padding: 8px 0;
+  padding: 10px 0;
   color: #333;
   text-decoration: none;
   transition: color 0.3s;
+  font-size: 16px;
+  border-bottom: 1px solid #eee;
 }
 
 .category-link:hover {
   color: #f3b926;
 }
 
-.filter-actions {
-  display: flex;
-  gap: 15px;
+.main-content {
+  flex: 1;
 }
 
-.filter-btn, .sort-btn {
-  padding: 8px 15px;
-  border: 1px solid #ddd;
-  background: white;
-  cursor: pointer;
+.filter-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  border: 1px solid #000;
+  background: transparent;
+  color: #000;
+  font-size: 14px;
+  font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.filter-btn i {
+  font-size: 16px;
+}
+
+.filter-btn:hover {
+  background: #f5f5f5;
+}
+
+.sort-wrapper {
+  position: relative;
+}
+
+.sort-btn {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.sort-btn i {
+  font-size: 18px;
+  color: #000;
+}
+
+.sort-btn span {
+  color: #666;
+}
+
+.sort-btn:hover {
+  background: #f5f5f5;
 }
 
 .products-grid {
@@ -140,14 +367,10 @@ onMounted(() => {
   background: white;
   border-radius: 8px;
   overflow: hidden;
-  transition: transform 0.3s;
-}
-
-.product-card:hover {
-  transform: translateY(-5px);
 }
 
 .product-image {
+  position: relative;
   aspect-ratio: 1;
   overflow: hidden;
 }
@@ -156,16 +379,47 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s;
 }
 
-.product-card:hover .product-image img {
-  transform: scale(1.05);
+.product-buttons {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 2;
+}
+
+.product-card:hover .product-buttons {
+  opacity: 1;
+}
+
+.btn-option {
+  background: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.btn-option:hover {
+  background-color: #f3b926;
+  color: white;
 }
 
 .product-info {
   padding: 15px;
   text-align: center;
+  background: white;
 }
 
 .product-title {
@@ -184,6 +438,29 @@ onMounted(() => {
 @media (max-width: 1200px) {
   .products-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .content-wrapper {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    margin-bottom: 30px;
+  }
+
+  .category-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .category-link {
+    padding: 8px 15px;
+    border: 1px solid #eee;
+    border-radius: 4px;
   }
 }
 

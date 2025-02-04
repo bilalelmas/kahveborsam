@@ -9,7 +9,7 @@
     </div>
 
     <!-- İndirimli Ürünler Butonu Link -->
-    <a href="/indirimli-urunler" class="btn discount-button">İNDİRİMLİ ÜRÜNLER</a>
+    <a href="/TheUrunlerPage" class="btn discount-button">İNDİRİMLİ ÜRÜNLER</a>
 
     <!-- Kapatma Butonu -->
     <button @click="closeNavbar" class="close-btn">
