@@ -1,53 +1,60 @@
 <template>
-  <div class="collection-container">
-    <div class="content-wrapper">
-      <!-- Sol Sidebar -->
-      <div class="sidebar">
-        <h3>KATEGORİLER</h3>
-        <ul class="category-list">
-          <li v-for="(category, index) in categories" :key="index">
-            <a href="#" class="category-link">{{ category.name }}</a>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Sağ İçerik -->
-      <div class="main-content">
-        <div class="filter-actions">
-          <button class="filter-btn">
-            <i class="bi bi-funnel"></i> Filtre
-          </button>
-          <div class="sort-wrapper">
-            <button class="sort-btn">
-              <i class="bi bi-grid"></i>
-              <span>Varsayılan sıralama</span>
-            </button>
-          </div>
+  <div>
+    <div class="collection-container">
+      <div class="content-wrapper">
+        <!-- Sol Sidebar -->
+        <div class="sidebar">
+          <h3>KATEGORİLER</h3>
+          <ul class="category-list">
+            <li v-for="(category, index) in categories" :key="index">
+              <a href="#" class="category-link">{{ category.name }}</a>
+            </li>
+          </ul>
         </div>
 
-        <div class="products-grid">
-          <div v-for="product in products" :key="product.id" class="product-card">
-            <div class="product-image">
-              <img :src="product.image" :alt="product.name">
-              <div class="product-buttons">
-                <button class="btn btn-option" @click="addToCart(product)">
-                  <i class="bi bi-cart"></i>
-                </button>
-                <button class="btn btn-option">
-                  <i class="bi bi-search"></i>
-                </button>
-                <button class="btn btn-option">
-                  <i class="bi bi-heart"></i>
-                </button>
+        <!-- Sağ İçerik -->
+        <div class="main-content">
+          <div class="filter-actions">
+            <button class="filter-btn">
+              <i class="bi bi-funnel"></i> Filtre
+            </button>
+            <div class="sort-wrapper">
+              <button class="sort-btn">
+                <i class="bi bi-grid"></i>
+                <span>Varsayılan sıralama</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="products-grid">
+            <div v-for="product in products" :key="product.id" class="product-card">
+              <div class="product-image">
+                <img :src="product.image" :alt="product.name">
+                <div class="product-buttons">
+                  <button class="btn btn-option" @click="addToCart(product)">
+                    <i class="bi bi-cart"></i>
+                  </button>
+                  <button class="btn btn-option">
+                    <i class="bi bi-search"></i>
+                  </button>
+                  <button class="btn btn-option">
+                    <i class="bi bi-heart"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="product-info">
+                <h3 class="product-title">{{ product.name }}</h3>
+                <div class="product-price">{{ product.price }} TL</div>
               </div>
             </div>
-            <div class="product-info">
-              <h3 class="product-title">{{ product.name }}</h3>
-              <div class="product-price">{{ product.price }} TL</div>
-            </div>
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Alt Banner - Tıklanabilir -->
+    <div class="bottom-banner" @click="navigateToProducts" role="button" tabindex="0">
+      <img src="https://kahveborsam.com/cdn/shop/files/2.jpg?v=1703765817" alt="Kahve Banner" class="banner-image">
     </div>
   </div>
 </template>
@@ -240,6 +247,15 @@ const addToCart = async (product: Product) => {
       alert('Ürün sepete eklenirken bir hata oluştu. Lütfen tekrar deneyin.');
     }
   }
+};
+
+const navigateToProducts = async () => {
+  await router.push('/TheUrunlerPage');
+  // Sayfa yüklendikten sonra en üste kaydır
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
 };
 
 onMounted(() => {
@@ -474,5 +490,24 @@ onMounted(() => {
   .products-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.bottom-banner {
+  margin-top: 40px;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.banner-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
 }
 </style>
