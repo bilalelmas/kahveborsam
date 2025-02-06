@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Carousel />
     <ContainerComponent />
     <Box />
     <Product />
@@ -14,6 +15,7 @@ import Box from '~/components/Box.vue';
 import Product from '~/components/Product.vue';
 import BannerComponent from '~/components/BannerComponent.vue';
 import Footer from '~/components/Footer.vue';
+import Carousel from '~/components/Carousel.vue';
 
 // Sayfa meta verisi (default layout kullanılıyor)
 definePageMeta({
