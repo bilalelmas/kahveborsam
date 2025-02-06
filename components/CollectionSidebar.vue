@@ -227,7 +227,7 @@ const addToCart = async (product: Product) => {
   try {
     if (!auth.currentUser) {
       alert('Lütfen önce giriş yapın');
-      router.push('/TheGirisPage');
+      router.push('/TheAccountPage');
       return;
     }
 

@@ -18,8 +18,8 @@
       </nav>
 
       <!-- Right Side Actions -->
-      <div class="header-actions d-flex align-items-center">
-        <button class="btn p-0 action-item me-3" @click="toggleSearchBar">
+      <div class="header-actions d-flex align-items-center gap-3">
+        <button class="btn p-0 action-item" @click="toggleSearchBar">
           <i class="bi bi-search"></i>
         </button>
 
@@ -27,7 +27,7 @@
           <i class="bi bi-person"></i>
         </button>
 
-        <nuxt-link to="/TheWishlistPage" class="action-item me-3">
+        <nuxt-link to="/TheWishlistPage" class="action-item">
           <i class="bi bi-heart"></i>
         </nuxt-link>
 
@@ -138,24 +138,36 @@ const toggleSearchBar = () => {
 }
 
 /* Sağdaki Aksiyonlar */
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
 .header-actions .action-item {
   font-size: 23px;
-  font-weight: bold; /* Yazıları kalın yap */
-  color:#26254f;
+  font-weight: bold;
+  color: #26254f;
   cursor: pointer;
-  margin-left: 2px; /* Aksiyon öğeleri arasındaki boşluk */
+  background: none;
+  border: none;
+  padding: 4px;
 }
-.header-actions button.action-item {
-  background-color: white !important; /* Arka plan beyaz */
-  border: none ;
+
+.header-actions .action-item:hover {
+  color: #f3b926;
 }
+
 .user-icon {
   font-size: 23px;
   background: none !important;
   border: none;
-  outline: none;
+  color: #26254f;
+  padding: 4px;
   cursor: pointer;
-  transition: transform 0.2s ease-in-out;
+}
+
+.user-icon:hover {
+  color: #f3b926;
 }
 
 </style>
