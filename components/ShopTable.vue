@@ -152,7 +152,7 @@ const updateCart = async () => {
 };
 
 const goToCheckout = () => {
-  router.push('/checkout');
+  router.push('');
 };
 </script>
 
