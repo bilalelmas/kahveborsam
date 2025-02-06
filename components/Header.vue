@@ -71,7 +71,7 @@ const handlePersonalClick = () => {
 };
 
 const navItems = [
-  { label: "Ana Sayfa", link: "/" },
+  { label: "Ana Sayfa", link: "/Anasayfapage" },
   { label: "Kahveler", link: "/TheUrunlerPage" },
   { label: "Hikayemiz" },
   { label: "Blog" },
