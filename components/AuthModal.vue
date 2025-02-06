@@ -69,15 +69,18 @@
   import { ref } from 'vue';
   import { useAuthStore } from '~/stores/auth';
   import { useRouter } from 'vue-router';
+  import { useCartStore } from '~/stores/cart';
   
   const router = useRouter();
   const authStore = useAuthStore();
+  const cartStore = useCartStore();
   const isOpen = ref(false);
   const email = ref('');
   const password = ref('');
   const isLogin = ref(true);
   const successMessage = ref('');
   const errorMessage = ref('');
+  const lastAttemptedProduct = ref(null);
   
   const openModal = () => { 
     isOpen.value = true;
@@ -114,11 +117,13 @@
       if (isLogin.value) {
         await authStore.login(email.value, password.value);
         closeModal();
-        router.push('/TheAccountPage');
+        if (lastAttemptedProduct.value) {
+          await cartStore.addToCart(lastAttemptedProduct.value);
+          lastAttemptedProduct.value = null;
+        }
       } else {
         await authStore.register(email.value, password.value);
         closeModal();
-        router.push('/TheAccountPage');
       }
     } catch (error) {
       if (error && typeof error === 'object' && 'code' in error) {

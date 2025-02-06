@@ -104,6 +104,7 @@
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCartStore } from '~/stores/cart';
+import { auth } from '~/boot/firebase';
 
 const router = useRouter();
 const cartStore = useCartStore();
@@ -145,6 +146,7 @@ const continueShopping = () => {
 
 const updateCart = async () => {
   try {
+    if (!auth.currentUser) return;
     await cartStore.updateCart();
   } catch (error) {
     console.error('Sepet güncellenirken hata:', error);

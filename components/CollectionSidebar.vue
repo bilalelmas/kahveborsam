@@ -31,7 +31,10 @@
               <div class="product-image">
                 <img :src="product.image" :alt="product.name">
                 <div class="product-buttons">
-                  <button class="btn btn-option" @click="addToCart(product)">
+                  <button 
+                    @click="handleAddToCart(product)" 
+                    class="btn btn-option"
+                  >
                     <i class="bi bi-cart"></i>
                   </button>
                   <button class="btn btn-option">
@@ -70,13 +73,26 @@ import { db } from '~/boot/firebase';
 const auth = getAuth();
 const router = useRouter();
 const cartStore = useCartStore();
+const authModal = ref();
 
 interface Product {
-  id: number;
+  id: number | string;
   name: string;
   price: string;
   image: string;
-  quantity: number;
+  category?: string;
+  description?: string;
+  quantity?: number;
+}
+
+interface FirestoreProduct {
+  id: string;
+  name: string;
+  price: string;
+  image: string;
+  quantity?: number;
+  category?: string;
+  description?: string;
 }
 
 const categories = ref([
@@ -187,21 +203,26 @@ const fetchProducts = async () => {
     console.log('Query snapshot:', querySnapshot);
     console.log('Döküman sayısı:', querySnapshot.size);
 
-    // Firestore'dan gelen verileri geçici bir array'de topla
     const fetchedProducts: Product[] = [];
     querySnapshot.docs.forEach(doc => {
-      const data = doc.data();
+      const data = doc.data() as FirestoreProduct;
       fetchedProducts.push({
-        id: parseInt(data.id),
+        id: data.id,
         name: data.name,
         price: data.price,
         image: data.image,
-        quantity: data.quantity
+        quantity: data.quantity,
+        category: data.category,
+        description: data.description
       });
     });
 
-    // ID'ye göre sırala
-    fetchedProducts.sort((a, b) => a.id - b.id);
+    // ID'ye göre sırala (string veya number olabilir)
+    fetchedProducts.sort((a, b) => {
+      const idA = typeof a.id === 'string' ? parseInt(a.id) : a.id;
+      const idB = typeof b.id === 'string' ? parseInt(b.id) : b.id;
+      return idA - idB;
+    });
 
     // Sıralanmış verileri mevcut ürünlerle birleştir
     fetchedProducts.forEach((product, index) => {
@@ -223,14 +244,8 @@ const fetchProducts = async () => {
   }
 };
 
-const addToCart = async (product: Product) => {
+const handleAddToCart = async (product: Product) => {
   try {
-    if (!auth.currentUser) {
-      alert('Lütfen önce giriş yapın');
-      router.push('/TheAccountPage');
-      return;
-    }
-
     await cartStore.addToCart({
       id: product.id.toString(),
       name: product.name,
@@ -238,13 +253,13 @@ const addToCart = async (product: Product) => {
       image: product.image,
       quantity: 1
     });
-    alert('Ürün başarıyla sepete eklendi!');
-  } catch (error: unknown) {
-    console.error('Sepete ekleme hatası:', error);
-    if (error instanceof Error) {
-      alert(`Ürün sepete eklenirken bir hata oluştu: ${error.message}`);
+  } catch (error) {
+    // Eğer giriş yapılmamışsa
+    if (error instanceof Error && error.message === 'Ürün eklemek için lütfen önce giriş yapın') {
+      alert('Ürün eklemek için lütfen önce giriş yapın'); // Alert göster
+      authModal.value?.openModal(); // Modal'ı aç
     } else {
-      alert('Ürün sepete eklenirken bir hata oluştu. Lütfen tekrar deneyin.');
+      console.error('Sepete ekleme hatası:', error);
     }
   }
 };
@@ -430,6 +445,12 @@ onMounted(() => {
 .btn-option:hover {
   background-color: #f3b926;
   color: white;
+}
+
+.btn-option:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #eee;
 }
 
 .product-info {
