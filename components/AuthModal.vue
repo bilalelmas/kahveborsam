@@ -113,32 +113,21 @@
     try {
       if (isLogin.value) {
         await authStore.login(email.value, password.value);
-        successMessage.value = 'Giriş başarılı! Yönlendiriliyorsunuz...';
-        errorMessage.value = '';
-      } else {
-        await authStore.register(email.value, password.value);
-        successMessage.value = 'Kayıt başarılı! Yönlendiriliyorsunuz...';
-        errorMessage.value = '';
-      }
-      
-      setTimeout(() => {
         closeModal();
         router.push('/TheAccountPage');
-      }, 2000);
-
-    } catch (error: unknown) {
-      console.error('Kimlik doğrulama hatası:', error);
-      successMessage.value = '';
-      
+      } else {
+        await authStore.register(email.value, password.value);
+        closeModal();
+        router.push('/TheAccountPage');
+      }
+    } catch (error) {
       if (error && typeof error === 'object' && 'code' in error) {
         const firebaseError = error as FirebaseError;
         if (firebaseError.code === 'auth/user-not-found' || firebaseError.code === 'auth/wrong-password') {
-          errorMessage.value = 'Kullanıcı bulunamadı veya şifre hatalı';
+          errorMessage.value = 'E-posta adresi veya şifre hatalı';
         } else {
           errorMessage.value = 'Bir hata oluştu. Lütfen tekrar deneyin.';
         }
-      } else {
-        errorMessage.value = 'Bir hata oluştu. Lütfen tekrar deneyin.';
       }
     }
   };
@@ -210,7 +199,7 @@
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+  
   }
   
   /* 🔹 Hata mesajı */
@@ -218,7 +207,7 @@
     color: #dc3545;
     background-color: #f8d7da;
     padding: 10px;
-    border-radius: 4px;
+   
     margin: 10px 0;
     font-size: 14px;
   }
@@ -232,24 +221,29 @@
   
   /* 🔹 Giriş/Kayıt Değiştirme */
   .switch-mode {
-    background: gray;
+    background: #f5f5f5;
     margin-top: 16px;
     font-size: 14px;
+    padding: 15px;
+  }
+  
+  .switch-mode span {
+    color: #000;
   }
   
   .btn-link {
     background: none;
     border: none;
-    color: gray;
+    color: #000;
     cursor: pointer;
     font-size: 14px;
+    font-weight: 500;
+    padding: 0;
+    margin-left: 5px;
   }
+  
   .btn-link:hover {
-    background: none;
-    border: none;
-    color: #f3b926;
-    cursor: pointer;
-    font-size: 14px;
+    text-decoration: underline;
   }
 
   .form-control:disabled,
@@ -268,7 +262,7 @@
     background-color: #d4edda;
     color: #155724;
     padding: 10px;
-    border-radius: 4px;
+ 
     margin: 10px 0;
     text-align: center;
   }
@@ -277,7 +271,7 @@
     background-color: #f8d7da;
     color: #721c24;
     padding: 10px;
-    border-radius: 4px;
+
     margin: 10px 0;
     text-align: center;
   }
