@@ -70,6 +70,7 @@
   import { useAuthStore } from '~/stores/auth';
   import { useRouter } from 'vue-router';
   import { useCartStore } from '~/stores/cart';
+  import type { FirebaseError } from 'firebase/app';
   
   const router = useRouter();
   const authStore = useAuthStore();
@@ -107,16 +108,12 @@
     }
   };
   
-  interface FirebaseError {
-    code: string;
-    message: string;
-  }
-
   const handleAuth = async () => {
     try {
       if (isLogin.value) {
         await authStore.login(email.value, password.value);
         closeModal();
+        router.push('/TheAccountPage');
         if (lastAttemptedProduct.value) {
           await cartStore.addToCart(lastAttemptedProduct.value);
           lastAttemptedProduct.value = null;
@@ -124,6 +121,7 @@
       } else {
         await authStore.register(email.value, password.value);
         closeModal();
+        router.push('/TheAccountPage');
       }
     } catch (error) {
       if (error && typeof error === 'object' && 'code' in error) {

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { auth, db } from '~/boot/firebase';
+import { auth, firestore } from '~/boot/firebase';
 
 interface CartProduct {
   id: string;
@@ -91,7 +91,7 @@ export const useCartStore = defineStore('cart', () => {
       }
 
       isLoading.value = true;
-      const cartRef = doc(db, 'carts', auth.currentUser.uid);
+      const cartRef = doc(firestore, 'carts', auth.currentUser.uid);
       const cartDoc = await getDoc(cartRef);
 
       if (cartDoc.exists()) {
@@ -111,7 +111,7 @@ export const useCartStore = defineStore('cart', () => {
 
   const saveCart = async (userId: string) => {
     try {
-      const cartRef = doc(db, 'carts', userId);
+      const cartRef = doc(firestore, 'carts', userId);
       await setDoc(cartRef, { items: items.value }, { merge: true });
     } catch (err) {
       console.error('Sepet kaydetme hatası:', err);

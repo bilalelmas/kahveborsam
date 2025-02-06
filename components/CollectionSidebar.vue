@@ -68,7 +68,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { useCartStore } from '~/stores/cart';
 import { useRouter } from 'vue-router';
 import { getAuth } from 'firebase/auth';
-import { db } from '~/boot/firebase';
+import { firestore } from '~/boot/firebase';
 
 const auth = getAuth();
 const router = useRouter();
@@ -195,10 +195,10 @@ const products = ref<Product[]>(defaultProducts);
 
 const fetchProducts = async () => {
   try {
-    const productsRef = collection(db, 'Products');
+    const productsRef = collection(firestore, 'Products');
     const querySnapshot = await getDocs(productsRef);
     
-    console.log('Firestore bağlantısı:', db);
+    console.log('Firestore bağlantısı:', firestore);
     console.log('Collection referansı:', productsRef);
     console.log('Query snapshot:', querySnapshot);
     console.log('Döküman sayısı:', querySnapshot.size);

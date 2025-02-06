@@ -10,6 +10,7 @@ import {
   addDoc,
   deleteDoc,
   onSnapshot,
+  where,
 } from 'firebase/firestore';
 import { firestore } from '~/boot/firebase';
 
@@ -24,7 +25,7 @@ interface StoreState {
 }
 
 // Ana store tanımlaması
-export const useStore = defineStore('store', {
+export const useStore = defineStore('main', {
   state: (): StoreState => ({
     items: [],
   }),
