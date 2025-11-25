@@ -1,23 +1,23 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { initializeApp, getApps, type FirebaseOptions } from 'firebase/app';
+import { getAuth, type Auth } from 'firebase/auth';
+import { getFirestore, type Firestore } from 'firebase/firestore';
 
-// Firebase yapılandırması
-const firebaseConfig = {
-    apiKey: "AIzaSyDV6MGJ3Oh-Pg0mBCD6maLi1dERHK92Ud8",
-    authDomain: "kahveborsam-38ff0.firebaseapp.com",
-    projectId: "kahveborsam-38ff0",
-    storageBucket: "kahveborsam-38ff0.appspot.com",
-    messagingSenderId: "491701481565",
-    appId: "1:491701481565:web:2a30fd17f2ef7494cc1db4"
+const firebaseConfig: FirebaseOptions = {
+  apiKey: import.meta.env.NUXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: import.meta.env.NUXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.NUXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.NUXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.NUXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.NUXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Firebase'i başlat
-const app = initializeApp(firebaseConfig);
+if (!firebaseConfig.apiKey) {
+  throw new Error('Firebase yapılandırması eksik. Lütfen .env dosyanızı kontrol edin.');
+}
 
-// Auth ve Firestore servislerini al
-const auth = getAuth(app);
-const db = getFirestore(app);
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 
-// Export both as named exports
+const auth: Auth = getAuth(app);
+const db: Firestore = getFirestore(app);
+
 export { auth, db, db as firestore };
